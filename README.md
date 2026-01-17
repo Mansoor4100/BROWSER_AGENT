@@ -1,53 +1,47 @@
-📄 RAG-Based Document Question Answering System
-<p align="center"> <img src="https://raw.githubusercontent.com/langchain-ai/langchain/master/docs/static/img/langchain_stack.png" width="120" alt="RAG Logo"/> </p> <p align="center"> <b>An end-to-end Retrieval-Augmented Generation (RAG) system for answering questions strictly from uploaded documents.</b> </p> <p align="center"> Built with <b>FastAPI</b>, <b>FAISS</b>, <b>HuggingFace LLMs</b>, and <b>Streamlit</b> — runs fully on CPU. </p>
+🤖 Autonomous Browser Agent
+<p align="center"> <img src="https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/images/playwright-logo.svg" width="120" alt="Browser Agent Logo"/> </p> <p align="center"> <b>An LLM-powered autonomous browser agent that can plan, navigate, interact, and extract information from the web.</b> </p> <p align="center"> Built using <b>Playwright</b>, <b>HuggingFace LLMs</b>, and <b>Python</b> — fully CPU-based. </p>
 🚀 Key Features
 
-📂 Upload multiple PDF documents
+🌐 Autonomous web browsing using Playwright
 
-🔍 Semantic search using FAISS vector database
+🧠 LLM-driven task planning (JSON-based action plans)
 
-🤖 Context-aware answers using FLAN-T5
+⌨️ Browser actions: OPEN, TYPE, PRESS, CLICK, WAIT
 
-❌ No hallucinations — answers only from documents
+🔍 Dynamic content extraction from real websites
 
-🧠 Sentence-transformer based embeddings
+🔗 Multi-link traversal and data extraction
 
-🖥️ Clean Streamlit UI
+🛡️ Robust handling of invalid actions and malformed LLM outputs
 
-⚙️ FastAPI backend with modular RAG pipeline
+💻 Runs entirely on CPU (no GPU required)
 
-💻 CPU-only execution (no GPU required)
+📄 Saves extracted data to structured JSON files
 
 🏗️ Tech Stack
 Layer	Technology
-Backend	FastAPI
-Frontend	Streamlit
-LLM	google/flan-t5-large (HuggingFace)
-Embeddings	sentence-transformers/all-MiniLM-L6-v2
-Vector DB	FAISS
-PDF Loader	PyPDFLoader
+Browser Automation	Playwright
+LLM	google/flan-t5-base (HuggingFace)
+Planning	JSON-based LLM action planning
 Language	Python 3.10+
+Runtime	CPU-only
+Environment	Virtualenv
 📁 Project Structure
-rag-doc-qa/
+autonomous-browser-agent/
 │
-├── back/
-│   ├── app.py                # FastAPI backend
-│   ├── rag_pipeline.py       # Retrieval + Generation logic
-│   ├── ingest.py             # PDF ingestion & FAISS indexing
-│   ├── faiss_index/          # Vector store
-│   └── uploads/              # Uploaded PDFs
-│
-├── frontend/
-│   └── streamlit_app.py      # Streamlit UI
-│
+├── agent.py                  # Main controller (planner + executor)
+├── agent_planner.py          # LLM-based action planner
+├── browser_agent.py          # Playwright browser wrapper
+├── extracted_results.json    # Single-page extraction output
+├── multi_extracted_results.json  # Multi-link extraction output
 ├── venv/
 ├── requirements.txt
 └── README.md
 
 ⚙️ Installation & Setup
 1️⃣ Clone the Repository
-git clone https://github.com/your-username/rag-doc-qa.git
-cd rag-doc-qa
+git clone https://github.com/your-username/autonomous-browser-agent.git
+cd autonomous-browser-agent
 
 2️⃣ Create Virtual Environment
 python -m venv venv
@@ -55,65 +49,84 @@ source venv/bin/activate   # Windows: venv\Scripts\activate
 
 3️⃣ Install Dependencies
 pip install -r requirements.txt
+playwright install
 
-▶️ Running the Application
-🔹 Start Backend (FastAPI)
-cd back
-uvicorn app:app --reload
-
-
-Backend available at:
-
-http://127.0.0.1:8000
-
-🔹 Start Frontend (Streamlit)
-cd frontend
-streamlit run streamlit_app.py
+▶️ Running the Agent
+python agent.py
 
 
-Frontend available at:
+The agent will:
 
-http://localhost:8501
+Generate a JSON plan using the LLM
 
-🧪 How It Works
+Open the browser (visible mode)
 
-User uploads one or more PDF files
+Perform search and navigation
 
-PDFs are split into semantic chunks
+Extract content
 
-Chunks are embedded using sentence-transformers
+Save results to JSON files
 
-Embeddings are stored in FAISS
+🧠 How the Agent Works
 
-User asks a question
+User defines a task (e.g., Search for Python latest version)
 
-Relevant chunks are retrieved
+LLM converts the task into structured JSON actions
 
-LLM generates an answer only from retrieved context
+Agent parses and validates the plan
 
-🛡️ Hallucination Control
+Browser executes actions step-by-step
 
-The system is designed to avoid hallucinations by:
+Agent extracts text, links, and page content
 
-Using strict prompt instructions
+Results are saved for later use
 
-Restricting answers to retrieved chunks only
+🧩 Supported Actions
+Action	Description
+OPEN	Navigate to a URL
+TYPE	Type text into input fields
+PRESS	Keyboard actions (Enter, etc.)
+CLICK	Click page elements
+WAIT	Dynamic wait for page load
+EXTRACT	Extract text or attributes
+DONE	End task execution
+🛠️ Challenges Faced & Solutions
+❌ Invalid URLs from LLM
 
-Returning “I don’t know” when context is missing
+Problem: LLM generated malformed URLs
+Solution: Added strict validation and action filtering
 
-No external knowledge injection
+❌ LLM returning plain text instead of JSON
+
+Problem: Planner output was not executable
+Solution: Enforced JSON-only planning format
+
+❌ Pages closing too quickly
+
+Problem: Browser exited before observation
+Solution: Added dynamic waits and execution control
+
+❌ Selector mismatches across sites
+
+Problem: Different DOM structures
+Solution: Used selector fallbacks (article p, main p, etc.)
+
+❌ Over-extraction (YouTube, StackOverflow noise)
+
+Problem: Irrelevant content captured
+Solution: Scoped extraction to meaningful page sections
 
 📸 Demo (Add to GitHub)
 
 You can include:
 
-Screenshots of Streamlit UI
+Browser opening and searching
 
-PDF upload flow
+Clicking top results
 
-Question → Answer output
+Extracted content JSON
 
-Optional demo GIF
+Demo GIF
 
 Example:
 
@@ -121,35 +134,37 @@ Example:
 
 📌 Future Improvements
 
-Source citations with page numbers
+Memory across multiple tasks
 
-Chat history & conversational memory
+Task chaining (multiple searches in one run)
 
-React / Next.js frontend
+Page summarization using LLM
 
-Dockerized deployment
+Vision-based DOM understanding
 
-Cloud hosting (HF Spaces / AWS / Render)
+Tool-based agent framework (LangGraph / CrewAI)
 
-RAG evaluation metrics
+Headless cloud deployment
 
-Multi-document comparison
+Rate-limit and CAPTCHA handling
 
 👨‍💻 Author
 
 Shaik Nabi Mansoor
-AI | Machine Learning | Agentic Systems | Full-Stack Development
+AI | LLM Agents | Browser Automation | Full-Stack Development
 
 ⭐ Why This Project Matters
 
 This project demonstrates:
 
-Real-world RAG architecture
+Real-world agentic AI systems
 
-Strong ML + backend integration
+LLM-driven decision making
 
-Practical handling of LLM limitations
+Practical browser automation
 
-Clean, scalable, production-ready design
+Handling unreliable LLM outputs
 
-Recruiter-relevant AI system building
+Production-style error handling
+
+Strong foundation for AI agents and RPA systems
