@@ -1,184 +1,155 @@
-Autonomous Browser Agent (LLM-Powered)
-Overview
+📄 RAG-Based Document Question Answering System
+<p align="center"> <img src="https://raw.githubusercontent.com/langchain-ai/langchain/master/docs/static/img/langchain_stack.png" width="120" alt="RAG Logo"/> </p> <p align="center"> <b>An end-to-end Retrieval-Augmented Generation (RAG) system for answering questions strictly from uploaded documents.</b> </p> <p align="center"> Built with <b>FastAPI</b>, <b>FAISS</b>, <b>HuggingFace LLMs</b>, and <b>Streamlit</b> — runs fully on CPU. </p>
+🚀 Key Features
 
-This project is an Autonomous Browser Agent that uses a Large Language Model (LLM) to plan and execute browser actions such as searching, clicking links, waiting for page loads, and extracting content from web pages.
+📂 Upload multiple PDF documents
 
-Unlike rule-based scrapers, this agent:
+🔍 Semantic search using FAISS vector database
 
-Dynamically plans actions in JSON
+🤖 Context-aware answers using FLAN-T5
 
-Executes them using a real browser (Playwright)
+❌ No hallucinations — answers only from documents
 
-Handles multi-step web tasks autonomously
+🧠 Sentence-transformer based embeddings
 
-Example task:
+🖥️ Clean Streamlit UI
 
-“Search for Python latest version and extract content from top results.”
+⚙️ FastAPI backend with modular RAG pipeline
 
-Key Features
+💻 CPU-only execution (no GPU required)
 
-LLM-based JSON action planning
-
-Real browser automation using Playwright
-
-Supports actions:
-
-OPEN
-
-TYPE
-
-PRESS
-
-CLICK
-
-WAIT
-
-EXTRACT
-
-DONE
-
-Extracts content from multiple websites
-
-Stores structured results in JSON files
-
-CPU-only execution (no GPU required)
-
-Project Structure
-autonomous-browser-agent/
+🏗️ Tech Stack
+Layer	Technology
+Backend	FastAPI
+Frontend	Streamlit
+LLM	google/flan-t5-large (HuggingFace)
+Embeddings	sentence-transformers/all-MiniLM-L6-v2
+Vector DB	FAISS
+PDF Loader	PyPDFLoader
+Language	Python 3.10+
+📁 Project Structure
+rag-doc-qa/
 │
-├── agent.py                  # Main execution loop
-├── agent_planner.py          # LLM → JSON plan generator
-├── browser_agent.py          # Playwright browser wrapper
-├── extracted_results.json    # Single-page extraction output
-├── multi_extracted_results.json # Multi-page extraction output
+├── back/
+│   ├── app.py                # FastAPI backend
+│   ├── rag_pipeline.py       # Retrieval + Generation logic
+│   ├── ingest.py             # PDF ingestion & FAISS indexing
+│   ├── faiss_index/          # Vector store
+│   └── uploads/              # Uploaded PDFs
+│
+├── frontend/
+│   └── streamlit_app.py      # Streamlit UI
+│
+├── venv/
 ├── requirements.txt
-├── README.md
-└── .gitignore
+└── README.md
 
-Technologies Used
+⚙️ Installation & Setup
+1️⃣ Clone the Repository
+git clone https://github.com/your-username/rag-doc-qa.git
+cd rag-doc-qa
 
-Python
+2️⃣ Create Virtual Environment
+python -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
 
-Playwright (browser automation)
-
-Hugging Face Transformers
-
-LLM (text generation model)
-
-JSON-based agent planning
-
-DuckDuckGo (search engine)
-
-How It Works
-
-User provides a natural language task
-
-LLM converts the task into a JSON action plan
-
-Agent executes actions step-by-step in the browser
-
-Extracted content is saved into structured JSON files
-
-Agent stops automatically when the task is complete
-
-Demo
-Example Task
-Search for Python latest version and extract top 3 results content
-
-What Happens
-
-Opens DuckDuckGo
-
-Types the query
-
-Presses Enter
-
-Extracts result links
-
-Opens links one by one
-
-Extracts headings and paragraphs
-
-Saves results to JSON
-
-Demo Screenshots / GIF
-
-📸 Add screenshots here
-
-Browser opening DuckDuckGo
-
-Search results page
-
-Extracted JSON output
-
-📽️ Optional GIF
-
-Screen recording of python agent.py execution
-
-Output Example
-{
-  "url": "https://www.python.org/",
-  "content": [
-    "Welcome to Python.org",
-    "Python is a programming language..."
-  ]
-}
-
-Challenges Faced & Solutions
-
-Invalid URL errors
-
-Fixed by separating LLM planning from execution logic
-
-LLM generating non-action text
-
-Enforced strict JSON-only output
-
-Dynamic page loading
-
-Added wait and timeout handling
-
-Different page structures
-
-Used multiple fallback selectors
-
-Large content extraction
-
-Limited extraction scope and stored results incrementally
-
-Future Improvements
-
-Add headless / non-headless toggle
-
-Improve content summarization using LLM
-
-Add multi-task chaining
-
-Support file downloads
-
-Add retry logic for failed steps
-
-Integrate vector database (RAG) for extracted content
-
-Add UI dashboard for task monitoring
-
-How to Run
+3️⃣ Install Dependencies
 pip install -r requirements.txt
-python agent.py
 
-Use Cases
+▶️ Running the Application
+🔹 Start Backend (FastAPI)
+cd back
+uvicorn app:app --reload
 
-Web research automation
 
-Data collection for AI pipelines
+Backend available at:
 
-Autonomous web testing
+http://127.0.0.1:8000
 
-Content aggregation
+🔹 Start Frontend (Streamlit)
+cd frontend
+streamlit run streamlit_app.py
 
-AI agent experimentation
 
-Author
+Frontend available at:
+
+http://localhost:8501
+
+🧪 How It Works
+
+User uploads one or more PDF files
+
+PDFs are split into semantic chunks
+
+Chunks are embedded using sentence-transformers
+
+Embeddings are stored in FAISS
+
+User asks a question
+
+Relevant chunks are retrieved
+
+LLM generates an answer only from retrieved context
+
+🛡️ Hallucination Control
+
+The system is designed to avoid hallucinations by:
+
+Using strict prompt instructions
+
+Restricting answers to retrieved chunks only
+
+Returning “I don’t know” when context is missing
+
+No external knowledge injection
+
+📸 Demo (Add to GitHub)
+
+You can include:
+
+Screenshots of Streamlit UI
+
+PDF upload flow
+
+Question → Answer output
+
+Optional demo GIF
+
+Example:
+
+![Demo](demo.gif)
+
+📌 Future Improvements
+
+Source citations with page numbers
+
+Chat history & conversational memory
+
+React / Next.js frontend
+
+Dockerized deployment
+
+Cloud hosting (HF Spaces / AWS / Render)
+
+RAG evaluation metrics
+
+Multi-document comparison
+
+👨‍💻 Author
 
 Shaik Nabi Mansoor
-AI / ML | Agentic Systems | Automation
+AI | Machine Learning | Agentic Systems | Full-Stack Development
+
+⭐ Why This Project Matters
+
+This project demonstrates:
+
+Real-world RAG architecture
+
+Strong ML + backend integration
+
+Practical handling of LLM limitations
+
+Clean, scalable, production-ready design
+
+Recruiter-relevant AI system building
